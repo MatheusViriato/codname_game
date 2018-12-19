@@ -7,10 +7,15 @@ import json
 from sklearn import linear_model
 
 
-def verifyTwoWords(candidate, word_list):
+def verify_two_words(candidate, word_list):
     if '_' in candidate:
         return False
     return [word in candidate or candidate in word for word in word_list]
+
+
+def save_json_result(result):
+    with open('result.json', 'w') as outfile:
+        json.dump(result, outfile)
 
 
 def main():
@@ -37,15 +42,14 @@ def main():
     clf_result = []
 
     for word_candidate, _ in clf_similar_words:
-        if verifyTwoWords(word_candidate, my_words):
+        if verify_two_words(word_candidate, my_words):
             scores = {}
             for word in my_words:
                 scores[word] = model.similarity(word_candidate, word)
             clf_result.append({word_candidate: [w for w, s in sorted(
                 scores.items(), key=operator.itemgetter(1), reverse=True)[:5]]})
 
-    with open('result.json', 'w') as outfile:
-        json.dump(clf_result, outfile)
+    save_json_result(clf_result)
 
 
 if __name__ == "__main__":
